@@ -1,0 +1,27 @@
+{
+  "name": "el-todo",
+  "version": "1.0.0",
+  "description": "el_ todo app.",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify index.js -o bundle.js"
+  },
+  "keywords": [
+    "ToDo",
+    "el_"
+  ],
+  "author": "Maslakov Alexander <jmas.ukraine@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "el_": "^1.0.0"
+  },
+  "devDependencies": {
+    "babelify": "^7.0.2",
+    "browserify": "^12.0.1",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-stage-2": "^6.13.0"
+  },
+  "browserify": {
+    "transform": [["babelify", { "presets": ["es2015"] }]]
+  }
+}
