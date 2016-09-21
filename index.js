@@ -38,7 +38,7 @@ function renderTask (task, index) {
         <button data-task-remove>&times;</button>
       </label>
     </li>
-  `), {
+  `, { className: 'task' }), {
     '[data-task-title]': task.title,
     '[data-task-done]': (el) => {
       el.onclick = (event) => {
@@ -75,6 +75,7 @@ function renderForm () {
   return apply(el(`
     <form data-form>
       <input data-query type="text" name="query" />
+      <input type="submit" />
     </form>
   `), {
     '[data-form]': (el) => el.onsubmit = (event) => {
