@@ -13,7 +13,9 @@
   "author": "Maslakov Alexander <jmas.ukraine@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "el_": "^1.0.2"
+    "clone": "^1.0.2",
+    "deep-diff": "^0.3.4",
+    "el_": "^1.0.9"
   },
   "devDependencies": {
     "babelify": "^7.0.2",
@@ -22,6 +24,15 @@
     "babel-preset-stage-2": "^6.13.0"
   },
   "browserify": {
-    "transform": [["babelify", { "presets": ["es2015"] }]]
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "es2015"
+          ]
+        }
+      ]
+    ]
   }
 }
