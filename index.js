@@ -54,19 +54,21 @@ function renderTask (task, index) {
 }
 
 function renderTasks (tasks, filter) {
-  switch (filter) {
-    case FILTER_DONE:
-      tasks = tasks.filter((task) => {
-        return task.done===true;
-      });
-      break;
-    case FILTER_UNDONE:
-      tasks = tasks.filter((task) => {
-        return task.done===false;
-      });
-      break;
-  }
-  return el(tasks.map((task, i) => renderTask(task, i)));
+  return el(tasks.map((task, index) => {
+    switch (filter) {
+      case FILTER_DONE:
+        if (task.done!==true) {
+          return null;
+        }
+        break;
+      case FILTER_UNDONE:
+        if (task.done===true) {
+          return null;
+        }
+        break;
+    }
+    return renderTask(task, index);
+  }).filter((task) => task!==null));
 }
 
 function renderForm () {
