@@ -59,10 +59,7 @@ function renderTask (task, index) {
 }
 
 function renderTasks (tasks, filter) {
-  if (tasks.length===0) {
-    return el(`<p>Empty.</p>`);
-  }
-  return el(tasks.map((task, index) => {
+  let filteredTasks = tasks.map((task, index) => {
     switch (filter) {
       case FILTER_DONE:
         if (task.done!==true) {
@@ -76,7 +73,11 @@ function renderTasks (tasks, filter) {
         break;
     }
     return renderTask(task, index);
-  }).filter((task) => task!==null));
+  }).filter((task) => task!==null);
+  if (filteredTasks.length===0) {
+    return el(`<p>Empty.</p>`);
+  }
+  return el(filteredTasks);
 }
 
 function renderForm () {
