@@ -1,9 +1,7 @@
-import { el, apply, refresh } from 'el_';
+import { $el } from 'el_';
 import { createStore } from 'redux';
 import * as actions from './actions';
 import reducer from './reducer';
-import diff from 'deep-diff';
-import clone from 'clone';
 
 const store = createStore(reducer);
 
@@ -12,22 +10,22 @@ const FILTER_DONE = 'done';
 const FILTER_UNDONE = 'undone';
 
 function renderFlter () {
-  return apply(`
+  return $el(`
     <ul>
       <li><a data-all-btn href="#${FILTER_ALL}">All</a></li>
       <li><a data-done-btn href="#${FILTER_DONE}">Done</a></li>
       <li><a data-undone-btn href="#${FILTER_UNDONE}">Undone</a></li>
     </ul>
   `, {
-    '[data-all-btn]': (el) => el.onclick = (event) => {
+    'onclick [data-all-btn]': (el, event) => {
       event.preventDefault();
       store.dispatch(actions.filter(FILTER_ALL));
     },
-    '[data-done-btn]': (el) => el.onclick = (event) => {
+    'onclick [data-done-btn]': (el, event) => {
       event.preventDefault();
       store.dispatch(actions.filter(FILTER_DONE));
     },
-    '[data-undone-btn]': (el) => el.onclick = (event) => {
+    'onclick [data-undone-btn]': (el, event) => {
       event.preventDefault();
       store.dispatch(actions.filter(FILTER_UNDONE));
     }
@@ -35,7 +33,7 @@ function renderFlter () {
 }
 
 function renderTask (task, index) {
-  return apply(el(`
+  return $el(`
     <li>
       <label>
         <input data-task-done type="checkbox" name="tasks[]" />
@@ -43,15 +41,16 @@ function renderTask (task, index) {
         <button data-task-remove>&times;</button>
       </label>
     </li>
-  `, { className: 'task' }), {
-    '[data-task-title]': task.title,
-    '[data-task-done]': (el) => {
+  `, {
+    'className': 'task',
+    'find [data-task-title]': task.title,
+    'find [data-task-done]': (el) => {
       el.onclick = (event) => {
         store.dispatch(actions.done(index, el.checked));
       };
       el.checked = task.done;
     },
-    '[data-task-remove]': (el) => el.onclick = (event) => {
+    'onclick [data-task-remove]': (el, event) => {
       event.preventDefault();
       store.dispatch(actions.remove(index));
     }
@@ -75,19 +74,19 @@ function renderTasks (tasks, filter) {
     return renderTask(task, index);
   }).filter((task) => task!==null);
   if (filteredTasks.length===0) {
-    return el(`<p>Empty.</p>`);
+    return $el(`<p>Empty.</p>`);
   }
-  return el(filteredTasks);
+  return $el(filteredTasks);
 }
 
 function renderForm () {
-  return apply(`
+  return $el(`
     <form data-form>
       <input data-query type="text" name="query" />
       <input type="submit" />
     </form>
   `, {
-    '[data-form]': (el) => el.onsubmit = (event) => {
+    'onsubmit [data-form]': (el, event) => {
       event.preventDefault();
       let queryEl = el.querySelector('input[name="query"]');
       store.dispatch(actions.add({
@@ -97,44 +96,35 @@ function renderForm () {
       queryEl.value = '';
       queryEl.focus();
     },
-    '[data-query]': (el) => {
+    'find [data-query]': (el) => {
       el.focus();
     }
   });
 }
 
-function link (fn, paramNames, store) {
-  let state = clone(store.getState());
-  let el = fn.apply(null, paramNames.map((paramName) => state[paramName]));
+function watch (store, fn) {
+  let el = fn(store.getState());
   store.subscribe(() => {
-    let newState = store.getState();
-    let diffs = diff(state, newState);
-    if (!diffs) {
-      return;
-    }
-    if (diffs.some((d) => paramNames.indexOf(d.path[0])!==-1)) {
-      refresh(el, fn.apply(null, paramNames.map((paramName) => newState[paramName])));
-    }
-    state = clone(newState);
+    el.innerHTML = '';
+    el.appendChild(fn(store.getState()));
   });
   return el;
 }
 
-function renderApp (rootEl, data) {
-  return apply(rootEl, {
-    '#app': `
+function renderApp (store) {
+  return $el(`
       <div data-form></div>
       <nav data-filter></nav>
       <ul data-tasks></ul>
-    `,
-    '[data-filter]': link(renderFlter, ['filter'], store),
-    '[data-tasks]':  link(renderTasks, ['tasks', 'filter'], store),
-    '[data-form]':   renderForm()
+    `, {
+    'find [data-filter]': watch(store, (state) => renderFlter(state.filter)),
+    'find [data-tasks]':  watch(store, (state) => renderTasks(state.tasks, state.filter)),
+    'find [data-form]':   renderForm()
   });
 }
 
 function main () {
-  renderApp(document.body, store.getState());
+  document.getElementById('app').appendChild(renderApp(store));
   store.dispatch(actions.init({
     filter: location.hash.substring(1) || FILTER_ALL,
     tasks: [
