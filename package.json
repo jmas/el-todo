@@ -13,7 +13,7 @@
   "author": "Maslakov Alexander <jmas.ukraine@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "el_": "2.0.0"
+    "el_": "2.0.1"
   },
   "devDependencies": {
     "babelify": "^7.0.2",

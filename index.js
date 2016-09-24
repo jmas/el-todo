@@ -34,27 +34,23 @@ function renderFlter () {
 
 function renderTask (task, index) {
   return $el(`
-    <li>
-      <label>
-        <input data-task-done type="checkbox" name="tasks[]" />
-        <span data-task-title></span>
-        <button data-task-remove>&times;</button>
-      </label>
-    </li>
+    <label>
+      <input data-task-done type="checkbox" name="tasks[]" />
+      <span data-task-title></span>
+      <button data-task-remove>&times;</button>
+    </label>
   `, {
     'className': 'task',
     'find [data-task-title]': task.title,
     'find [data-task-done]': (el) => {
-      el.onclick = (event) => {
-        store.dispatch(actions.done(index, el.checked));
-      };
+      el.onclick = (event) => store.dispatch(actions.done(index, el.checked));
       el.checked = task.done;
     },
     'onclick [data-task-remove]': (el, event) => {
       event.preventDefault();
       store.dispatch(actions.remove(index));
     }
-  });
+  }, 'li');
 }
 
 function renderTasks (tasks, filter) {
@@ -76,7 +72,7 @@ function renderTasks (tasks, filter) {
   if (filteredTasks.length===0) {
     return $el(`<p>Empty.</p>`);
   }
-  return $el(filteredTasks);
+  return $el(filteredTasks, null, 'ul');
 }
 
 function renderForm () {
@@ -115,7 +111,7 @@ function renderApp (store) {
   return $el(`
       <div data-form></div>
       <nav data-filter></nav>
-      <ul data-tasks></ul>
+      <div data-tasks></div>
     `, {
     'find [data-filter]': watch(store, (state) => renderFlter(state.filter)),
     'find [data-tasks]':  watch(store, (state) => renderTasks(state.tasks, state.filter)),
