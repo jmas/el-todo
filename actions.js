@@ -4,9 +4,10 @@ export const REMOVE = 'remove';
 export const DONE = 'done';
 export const FILTER = 'filter';
 export const CLEAR_COMPLETED = 'clear_completed';
-export const EDIT = 'edit';
+export const TOGGLE_EDIT = 'toggle_edit';
 export const UPDATE = 'update';
 export const TOGGLE_ALL_COMPLETED = 'toggle_all_completed';
+export const STOP_EDITING = 'stop_editing';
 
 export function init (state) {
   return {
@@ -50,10 +51,11 @@ export function clearCompleted () {
   };
 }
 
-export function edit (index) {
+export function toggleEdit (index, edit) {
   return {
-    type: EDIT,
-    index
+    type: TOGGLE_EDIT,
+    index,
+    edit
   };
 }
 
@@ -70,3 +72,4 @@ export function toggleAllCompleted () {
     type: TOGGLE_ALL_COMPLETED
   };
 }
+

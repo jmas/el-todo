@@ -62,7 +62,12 @@ function renderTask (task, index) {
   `, {
     'className': cx({ 'completed': task.done, 'editing': task.editing }),
     'find label': task.title,
-    'find .edit': (el) => { el.value = task.title; },
+    'find .edit': (el) => {
+      el.value = task.title;
+      window.requestAnimationFrame(() => {
+        el.focus();
+      });
+    },
     'find .toggle': (el) => {
       el.onclick = (event) => store.dispatch(actions.done(index, el.checked));
       el.checked = task.done;
@@ -73,7 +78,17 @@ function renderTask (task, index) {
     },
     'onclick label': (el, event) => {
       event.preventDefault();
-      store.dispatch(actions.edit(index));
+      store.dispatch(actions.toggleEdit(index, true));
+    },
+    'onkeyup .edit': (el, event) => {
+      switch (event.keyCode) {
+        case 13:
+          store.dispatch(actions.update(index, el.value));
+          break;
+        case 27:
+          store.dispatch(actions.toggleEdit(index, false));
+          break;
+      }
     },
     'onblur .edit': (el) => {
       store.dispatch(actions.update(index, el.value));

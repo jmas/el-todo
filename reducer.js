@@ -26,8 +26,8 @@ export default function (state=DEFAULT_STATE, action) {
     case actions.CLEAR_COMPLETED:
       state.tasks = state.tasks.filter((task) => !task.done);
       return state;
-    case actions.EDIT:
-      state.tasks[action.index].editing = true;
+    case actions.TOGGLE_EDIT:
+      state.tasks[action.index].editing = action.edit;
       return state;
     case actions.UPDATE:
       state.tasks[action.index].title = action.title;
