@@ -5,9 +5,9 @@ ToDo app example wrote to show how use el_.
 # What it use
 
 * [El_](https://github.com/jmas/el_) is "Super lightweight tool for create DOM elements"
-* [Redux](https://github.com/reactjs/redux)
-* [TodoMVC App Template](https://github.com/tastejs/todomvc-app-template)
-* [classnames](https://github.com/JedWatson/classnames)
+* [Redux](https://github.com/reactjs/redux) is Flux-like store
+* [TodoMVC App Template](https://github.com/tastejs/todomvc-app-template) is nice template for Todo app's
+* [classnames](https://github.com/JedWatson/classnames) is pretty cool lightweight CSS class build tool
 
 # How to install
 
