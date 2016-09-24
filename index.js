@@ -64,9 +64,7 @@ function renderTask (task, index) {
     'find label': task.title,
     'find .edit': (el) => {
       el.value = task.title;
-      window.requestAnimationFrame(() => {
-        el.focus();
-      });
+      el.focus();
     },
     'find .toggle': (el) => {
       el.onclick = (event) => store.dispatch(actions.done(index, el.checked));
