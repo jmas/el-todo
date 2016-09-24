@@ -96,7 +96,7 @@ function renderTasks (tasks, filter) {
     return renderTask(task, index);
   }).filter((task) => task!==null);
   if (filteredTasks.length===0) {
-    return $el(`<p>Empty.</p>`);
+    return $el();
   }
   return $el(filteredTasks, { 'className': 'todo-list' }, 'ul');
 }
@@ -131,9 +131,9 @@ function renderCount (tasks) {
 function watch (store, fn) {
   let el = fn(store.getState());
   store.subscribe(() => {
-    let newEl = fn(store.getState());
-    el.parentNode.replaceChild(newEl, el);
-    el = newEl;
+    let elUpdated = fn(store.getState());
+    el.parentNode.replaceChild(elUpdated, el);
+    el = elUpdated;
   });
   return el;
 }
