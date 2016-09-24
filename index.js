@@ -35,20 +35,14 @@ function renderFilter (filter, label, isSelected) {
       el.href = '#'+filter;
       el.className = cx({ 'selected': isSelected });
     },
-    'onclick': (el, event) => store.dispatch(actions.filter(filter))
+    'onclick a': (el, event) => store.dispatch(actions.filter(filter))
   }, 'li');
 }
 
 function renderFilters (currentFilter) {
-  return $el(`
-    <ul class="filters"></ul>
-  `, {
-    'find .filters': (el) => {
-      Object.keys(FILTERS).forEach((filter) => {
-        el.appendChild(renderFilter(filter, FILTERS[filter], filter===currentFilter));
-      });
-    }
-  });
+  return $el(Object.keys(FILTERS).map((filter) => {
+      return renderFilter(filter, FILTERS[filter], filter===currentFilter);
+    }), { 'className': 'filters' }, 'ul');
 }
 
 function renderTask (task, index) {
@@ -110,7 +104,7 @@ function renderTasks (tasks, filter) {
 function renderForm () {
   return $el(`
     <form data-form>
-      <input class="new-todo" data-query type="text" name="query" autofocus />
+      <input class="new-todo" data-query type="text" name="query" />
     </form>
   `, {
     'onsubmit [data-form]': (el, event) => {
@@ -130,18 +124,16 @@ function renderForm () {
 }
 
 function renderCount (tasks) {
-  return $el(`<strong>0</strong> item left`, {
-    'find strong': (el) => {
-      el.innerHTML = tasks.filter((task) => isTaskFiltered(task, FILTER_ACTIVE)).length;
-    }
-  }, 'span');
+  let tasksLength = tasks.filter((task) => isTaskFiltered(task, FILTER_ACTIVE)).length;
+  return $el(`<strong>${tasksLength}</strong> item left`, null, 'span');
 }
 
 function watch (store, fn) {
   let el = fn(store.getState());
   store.subscribe(() => {
-    el.innerHTML = '';
-    el.appendChild(fn(store.getState()));
+    let newEl = fn(store.getState());
+    el.parentNode.replaceChild(newEl, el);
+    el = newEl;
   });
   return el;
 }
@@ -169,10 +161,10 @@ function renderApp (store) {
           <button class="clear-completed">Clear completed</button>
         </footer>
       </section>
-    `, {
+  `, {
+    'find [data-form]': renderForm(),
     'find [data-filter]': watch(store, (state) => renderFilters(state.filter)),
     'find [data-tasks]': watch(store, (state) => renderTasks(state.tasks, state.filter)),
-    'find [data-form]': renderForm(),
     'find .todo-count': watch(store, (state) => renderCount(state.tasks)),
     'onclick .clear-completed': (el, event) => {
       event.preventDefault();
