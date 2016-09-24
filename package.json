@@ -13,7 +13,12 @@
   "author": "Maslakov Alexander <jmas.ukraine@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "el_": "2.0.1"
+    "classnames": "^2.2.5",
+    "el_": "2.0.1",
+    "install": "^0.8.1",
+    "npm": "^3.10.8",
+    "todomvc-app-css": "^2.0.6",
+    "todomvc-common": "^1.0.2"
   },
   "devDependencies": {
     "babelify": "^7.0.2",

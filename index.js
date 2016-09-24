@@ -2,84 +2,102 @@ import { $el } from 'el_';
 import { createStore } from 'redux';
 import * as actions from './actions';
 import reducer from './reducer';
+import cx from 'classnames';
 
 const store = createStore(reducer);
 
 const FILTER_ALL = 'all';
-const FILTER_DONE = 'done';
-const FILTER_UNDONE = 'undone';
+const FILTER_ACTIVE = 'active';
+const FILTER_COMPLETED = 'completed';
+const FILTERS = {
+  [FILTER_ALL]: 'All',
+  [FILTER_ACTIVE]: 'Active',
+  [FILTER_COMPLETED]: 'Completed'
+};
 
-function renderFlter () {
+function isTaskFiltered (task, filter) {
+  switch (filter) {
+    case FILTER_COMPLETED:
+      return task.done;
+      break;
+    case FILTER_ACTIVE:
+      return !task.done;
+  }
+  return true;
+}
+
+function renderFilter (filter, label, isSelected) {
   return $el(`
-    <ul>
-      <li><a data-all-btn href="#${FILTER_ALL}">All</a></li>
-      <li><a data-done-btn href="#${FILTER_DONE}">Done</a></li>
-      <li><a data-undone-btn href="#${FILTER_UNDONE}">Undone</a></li>
-    </ul>
+      <a href="#"></a>
   `, {
-    'onclick [data-all-btn]': (el, event) => {
-      event.preventDefault();
-      store.dispatch(actions.filter(FILTER_ALL));
+    'find a': (el) => {
+      el.innerHTML = label;
+      el.href = '#'+filter;
+      el.className = cx({ 'selected': isSelected });
     },
-    'onclick [data-done-btn]': (el, event) => {
-      event.preventDefault();
-      store.dispatch(actions.filter(FILTER_DONE));
-    },
-    'onclick [data-undone-btn]': (el, event) => {
-      event.preventDefault();
-      store.dispatch(actions.filter(FILTER_UNDONE));
+    'onclick': (el, event) => store.dispatch(actions.filter(filter))
+  }, 'li');
+}
+
+function renderFilters (currentFilter) {
+  return $el(`
+    <ul class="filters"></ul>
+  `, {
+    'find .filters': (el) => {
+      Object.keys(FILTERS).forEach((filter) => {
+        el.appendChild(renderFilter(filter, FILTERS[filter], filter===currentFilter));
+      });
     }
   });
 }
 
 function renderTask (task, index) {
   return $el(`
-    <label>
-      <input data-task-done type="checkbox" name="tasks[]" />
-      <span data-task-title></span>
-      <button data-task-remove>&times;</button>
-    </label>
+    <div class="view">
+      <input class="toggle" type="checkbox" checked>
+      <label></label>
+      <button class="destroy"></button>
+    </div>
+    <input class="edit" />
   `, {
-    'className': 'task',
-    'find [data-task-title]': task.title,
-    'find [data-task-done]': (el) => {
+    'className': cx({ 'completed': task.done, 'editing': task.editing }),
+    'find label': task.title,
+    'find .edit': (el) => { el.value = task.title; },
+    'find .toggle': (el) => {
       el.onclick = (event) => store.dispatch(actions.done(index, el.checked));
       el.checked = task.done;
     },
-    'onclick [data-task-remove]': (el, event) => {
+    'onclick .destroy': (el, event) => {
       event.preventDefault();
       store.dispatch(actions.remove(index));
+    },
+    'onclick label': (el, event) => {
+      event.preventDefault();
+      store.dispatch(actions.edit(index));
+    },
+    'onblur .edit': (el) => {
+      store.dispatch(actions.update(index, el.value));
     }
   }, 'li');
 }
 
 function renderTasks (tasks, filter) {
   let filteredTasks = tasks.map((task, index) => {
-    switch (filter) {
-      case FILTER_DONE:
-        if (task.done!==true) {
-          return null;
-        }
-        break;
-      case FILTER_UNDONE:
-        if (task.done===true) {
-          return null;
-        }
-        break;
+    if (! isTaskFiltered(task, filter)) {
+      return null;
     }
     return renderTask(task, index);
   }).filter((task) => task!==null);
   if (filteredTasks.length===0) {
     return $el(`<p>Empty.</p>`);
   }
-  return $el(filteredTasks, null, 'ul');
+  return $el(filteredTasks, { 'className': 'todo-list' }, 'ul');
 }
 
 function renderForm () {
   return $el(`
     <form data-form>
-      <input data-query type="text" name="query" />
-      <input type="submit" />
+      <input class="new-todo" data-query type="text" name="query" autofocus />
     </form>
   `, {
     'onsubmit [data-form]': (el, event) => {
@@ -98,6 +116,14 @@ function renderForm () {
   });
 }
 
+function renderCount (tasks) {
+  return $el(`<strong>0</strong> item left`, {
+    'find strong': (el) => {
+      el.innerHTML = tasks.filter((task) => isTaskFiltered(task, FILTER_ACTIVE)).length;
+    }
+  }, 'span');
+}
+
 function watch (store, fn) {
   let el = fn(store.getState());
   store.subscribe(() => {
@@ -109,13 +135,40 @@ function watch (store, fn) {
 
 function renderApp (store) {
   return $el(`
-      <div data-form></div>
-      <nav data-filter></nav>
-      <div data-tasks></div>
+      <section class="todoapp">
+        <header class="header">
+          <h1>todos</h1>
+          <div data-form></div>
+        </header>
+        <!-- This section should be hidden by default and shown when there are todos -->
+        <section class="main">
+          <input class="toggle-all" type="checkbox" />
+          <label for="toggle-all">Mark all as complete</label>
+          <div data-tasks></div>
+        </section>
+        <!-- This footer should hidden by default and shown when there are todos -->
+        <footer class="footer">
+          <!-- This should be 0 items left by default -->
+          <span class="todo-count"></span>
+          <!-- Remove this if you don't implement routing -->
+          <div data-filter></div>
+          <!-- Hidden if no completed items are left ↓ -->
+          <button class="clear-completed">Clear completed</button>
+        </footer>
+      </section>
     `, {
-    'find [data-filter]': watch(store, (state) => renderFlter(state.filter)),
-    'find [data-tasks]':  watch(store, (state) => renderTasks(state.tasks, state.filter)),
-    'find [data-form]':   renderForm()
+    'find [data-filter]': watch(store, (state) => renderFilters(state.filter)),
+    'find [data-tasks]': watch(store, (state) => renderTasks(state.tasks, state.filter)),
+    'find [data-form]': renderForm(),
+    'find .todo-count': watch(store, (state) => renderCount(state.tasks)),
+    'onclick .clear-completed': (el, event) => {
+      event.preventDefault();
+      store.dispatch(actions.clearCompleted());
+    },
+    'onclick .toggle-all': (el, event) => {
+      event.preventDefault();
+      store.dispatch(actions.toggleAllCompleted());
+    }
   });
 }
 

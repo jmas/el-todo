@@ -1,44 +1,24 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>El_ To-Do app</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        padding: 20px;
-      }
-      #app {
-        border: 1px solid silver;
-        padding: 20px;
-        border-radius: 3px;
-      }
-      ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-      form {
-        border-bottom: 1px solid silver;
-        padding-bottom: 20px;
-      }
-      nav {
-        padding: 20px 0;
-      }
-      nav li {
-        display: inline-block;
-        margin-right: 10px;
-      }
-      .task {
-        padding: 10px;
-        background-color: silver;
-        margin-bottom: 3px;
-        border-radius: 3px;
-      }
-    </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Template • TodoMVC</title>
+    <link rel="stylesheet" href="node_modules/todomvc-common/base.css" />
+    <link rel="stylesheet" href="node_modules/todomvc-app-css/index.css" />
   </head>
   <body>
 
     <div id="app"></div>
+    
+    <footer class="info">
+      <p>Double-click to edit a todo</p>
+      <!-- Remove the below line ↓ -->
+      <p>Template by <a href="http://sindresorhus.com">Sindre Sorhus</a></p>
+      <!-- Change this out with your name and url ↓ -->
+      <p>Created with <a href="https://github.com/jmas/el_">el_</a></p>
+      <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+    </footer>
 
     <script src="bundle.js"></script>
   </body>
