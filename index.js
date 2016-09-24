@@ -188,10 +188,19 @@ function renderApp (store) {
 }
 
 function main () {
+  let tasks = null;
+  if ('localStorage' in window) {
+    tasks = window.localStorage.getItem('tasks');
+    try {
+      tasks = JSON.parse(tasks);
+    } catch (e) { }
+    store.subscribe(() =>
+      window.localStorage.setItem('tasks', JSON.stringify(store.getState().tasks)));
+  }
   document.getElementById('app').appendChild(renderApp(store));
   store.dispatch(actions.init({
     filter: location.hash.substring(1) || FILTER_ALL,
-    tasks: [
+    tasks: tasks || [
       {
         title: 'Make an app',
         done: true
